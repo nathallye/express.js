@@ -123,7 +123,7 @@ server.get("/", function(req, res) {
 server.listen(3000);
 ```
 
-- E para caso ele consiga realmente alorcar essa porta e ficar escutando ela vamos chamar uma função callback(arrow function) que irá exibir um `console` para identificarmos que deu tudo certo:
+- E caso ele consiga realmente alorcar essa porta e ficar escutando ela vamos chamar uma função callback(arrow function) que irá exibir um `console` para identificarmos que deu tudo certo:
 
 ``` JS
 const express = require("express");
@@ -163,3 +163,111 @@ server.all("/test", function(req, res) {
 
 server.listen(3000, () => console.log("Executando..."));
 ```
+
+## Cadeia de Middlewares
+
+- Para entendermos como funciona na prática como funciona a questão do `Chain of Responsibility`, termos uma cadeia de de `Middlewares` para atender determinada requisição, iremos criar um arquivo chamado `ex02.js` e nele iremos fazer a importação do `express` através do `require` e armazenando em uma variável chamada `express`.
+Em seguida, criar uma const chamada `server`(normalmente essa constante é chamada de `app`) que irá receber uma instância de `express`:
+
+``` JS
+const express = require("express");
+const server = express();
+```
+
+- Em seguida, iremos criar uma porta, vamos informar ao servidor/`server` ficar escutando/`listen` essa porta que nesse caso será `3000`.
+Caso ele consiga realmente alorcar essa porta e ficar escutando ela vamos chamar uma função callback(arrow function) que irá exibir um `console` para identificarmos que deu tudo certo:
+
+``` JS
+const express = require("express");
+const server = express();
+
+server.listen(3000, () => console.log("Executando..."));
+```
+
+- Agora, iremos mapear para a URL raiz da aplicação(/) para o método `get` uma funcionalidade, vamos associar uma função/um `middleware`, ou seja, vamos mapear essa rota, apontar para um middleware e dentro dele será feito um processamente.
+Para isso, iremos chamar o método `get` do `server`(que armazena a instância do express) que irá apontar para a URL `/`(raiz da aplicação) e o segundo parâmetro é justamente uma função middleware que irá receber como parâmetros `req`, `res` e `next`:
+
+``` JS
+const express = require("express");
+const server = express();
+
+server.get("/", function(req, res, next) { // podemos suprimir esse último param `next`, mesmo que a função receba por padrão um determinado conjunto de parâmetros, não somos obrigados a passar todos; mas só podemos suprimir os últimos, não podemos suprimir um do meio
+
+});
+
+server.listen(3000, () => console.log("Executando..."));
+```
+
+- E no corpo da função iremos exibir um console "Início", quando essa função/esse `middleware` for executado.
+Em seguida, vamos chamar o próximo/`next` middleware/função e exibir um console "Fim":
+
+``` JS
+const express = require("express");
+const server = express();
+
+server.get("/", function(req, res, next) {
+  console.log("Início...");
+  next(); // next é uma função que irá chamar o próximo middleware
+  console.log("Fim...");
+});
+
+server.listen(3000, () => console.log("Executando..."));
+```
+
+- Feito isso, iremos mapear novamente o método `get` para a mesma URL("/" - raiz da aplicação) e dessa vez a função middleware receber como parâmetros apenas `req` e `res`:
+
+``` JS
+const express = require("express");
+const server = express();
+
+server.get("/", function(req, res, next) {
+  console.log("Início...");
+  next(); // next é uma função que irá chamar o próximo middleware
+  console.log("Fim...");
+});
+
+server.get("/", function(req, res) {
+
+});
+
+server.listen(3000, () => console.log("Executando..."));
+```
+
+- E no corpo da função iremos exibir um console "Resposta", quando essa função/esse `middleware` for executado.
+Em seguida, vamos enviar uma resposta para o browser chamando `res.send` e passando um `h1`:
+
+``` JS
+const express = require("express");
+const server = express();
+
+server.get("/", function(req, res, next) {
+  console.log("Início...");
+  next(); // next é uma função que irá chamar o próximo middleware
+  console.log("Fim..."); 
+});
+
+server.get("/", function(req, res) {
+  console.log("Resposta...");
+  res.send("<h1>Olá Express!</h1>");
+});
+
+server.listen(3000, () => console.log("Executando..."));
+```
+
+- Por fim, vamos rodar esse arquivo no servidor node, para isso, no terminal(no diretório do arquivo) iremos usar o comando seguinte:
+
+``` JS
+node ex02.js
+     [name_file]
+```
+
+- Em seguida, para visualizarmos o retorno dessa rota(raiz) vamos abrir no navegador a URL `http://localhost:3000/`; No browser termos título "Olá Express!" e no console podemos notar o retorno seguinte:
+
+``` 
+Executando...
+Início...
+Resposta...
+Fim... // executou o próximo middleware da resposta e quando terminou continuou a excutar o primeiro middleware
+``` 
+
+- Com isso, podemos concluir que temos uma cadeia de responsabilidades, ou seja, uma cadeia de middlewares.
