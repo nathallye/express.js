@@ -143,7 +143,7 @@ node ex01.js
      [name_file]
 ```
 
-- Em seguida, para visualizarmos o retorno dessa rota(raiz) vamos abrir no navegador a URL `http://localhost:3000/`;
+- Em seguida, para visualizarmos o retorno dessa rota(raiz) vamos abrir no navegador a URL `http://localhost:3000/`.
 
 ## Mapeando uma Rota(todos os métodos)
 
@@ -275,7 +275,7 @@ Fim... // executou o próximo middleware da resposta e quando terminou continuou
 ## Método USE
 
 - Com o método use temos uma outra forma de mapear a URL e criar uma cadeia de middlewares no Express.
-Para entendermos melhor vamos duplicar o exercício anterior(`ex02.js`) e renomear essa cópia para `ex03.js` e dentro desse arquivo substituir o método `get` por `use` e no lugar da URL raiz("/") vamos colocar `/api`:
+Para entendermos melhor vamos duplicar o exercício anterior(`ex02.js`) e renomear essa cópia para `ex03_use.js` e dentro desse arquivo substituir o método `get` por `use` e no lugar da URL raiz("/") vamos colocar `/api`:
 
 ``` JS
 const express = require("express");
@@ -317,7 +317,7 @@ O segundo, é que mesmo se colocarmos a URL assim `http://localhost:3000/api/bla
 
 ## Método Route
 
-- Para entendermos melhor o método `route`, iremos criar um arquivo chamado `ex04.js` e nele iremos fazer a importação do `express` através do `require` e armazenando em uma variável chamada `express`.
+- Para entendermos melhor o método `route`, iremos criar um arquivo chamado `ex04_route.js` e nele iremos fazer a importação do `express` através do `require` e armazenando em uma variável chamada `express`.
 Em seguida, criar uma const chamada `server`(normalmente essa constante é chamada de `app`) que irá receber uma instância de `express`:
 
 ``` JS
@@ -362,3 +362,184 @@ server.listen(3000, () => console.log("Executando..."));
 ```
 
 - Podemos testar a resposta a essas requisições via `Postman`.
+
+## Express Router
+
+- O express.Router nos ajuda a manipular nossas rotas em aplicativos NodeJS.
+Para entendermos melhor o método, iremos criar um arquivo chamado `ex05_router.js` e nele iremos fazer a importação do `express` através do `require` e armazenando em uma variável chamada `express`.
+Em seguida, criar uma const chamada `router` que irá receber uma instância de `express.Router()`:
+
+``` JS
+const express = require("express");
+const router = express.Router();
+```
+
+- Agora, iremos mapear qualquer URL passada(para isso não iremos passar nenhuma URL como parâmetro para o use) com o método `use` que irá mapear para todos os método HTTP.
+Para isso, iremos chamar o método `use` do `server`(que armazena a instância do express.Router()) que não irá receber nenhum URL como parâmetro e função middleware(arrow function) que irá receber como parâmetros `req`, `res` e `next`:
+
+``` JS
+const express = require("express");
+const router = express.Router();
+
+router.use((req, res, next) => {
+
+});
+```
+
+- E no corpo desse middleware global(que irá ser chamado em todas as requisições) vamos criar um middleware que será chamado para qualquer rota dentro desse `router` e ele vai calcular o tempo de duração da requisição.
+Para isso, primeiramente iremos criar uima const chamada `init` que irá receber a hora atual em milisegundos através do método `Date.now()`:
+
+``` JS
+const express = require("express");
+const router = express.Router();
+
+router.use((req, res, next) => {
+  const init = Date.now();
+});
+```
+
+- Depois de "pegarmos" essa hora inicial vamos chamar a função `next()` que irá invocar o resto dos middlewares da cadeia e quando finalizar a execução de todos esses middlewares seguintes, irá retornar para o middleware atual e exibir um console com o tempo de execução desses middlewares, que nada mais é que a hora atual(`Date.now()`) menos a hora inicial(armazenada em `init`):
+
+``` JS
+const express = require("express");
+const router = express.Router();
+
+router.use((req, res, next) => {
+  const init = Date.now();
+  next();
+  console.log(`Tempo = ${Date.now() - init} ms.`);
+});
+```
+
+- Em seguida, iremos mapear a URL `/produts/:id`(irá receber como parâmetro o id do produto) para o método `get` e quando for feita uma requisição para essa URL com esse método(get) o middleware(arrow function) será chamado e irá retornar uma resposta em objeto JSON(`res.json`) com o `id` passado via `params` na resposta/`res` e o nome do produto:
+
+``` JS
+const express = require("express");
+const router = express.Router();
+
+router.use((req, res, next) => {
+  const init = Date.now();
+  next();
+  console.log(`Tempo = ${Date.now() - init} ms.`);
+});
+
+router.get("/produts/:id", (req, res) => {
+  res.json({id: req.params.id, name: "Caneta"});
+});
+```
+
+- O mesmo iremos fazer para a URL de clientes `/clients/:id`:
+
+``` JS
+const express = require("express");
+const router = express.Router();
+
+router.use((req, res, next) => {
+  const init = Date.now();
+  next();
+  console.log(`Tempo = ${Date.now() - init} ms.`);
+});
+
+router.get("/produts/:id", (req, res) => {
+  res.json({id: req.params.id, name: "Caneta"});
+});
+
+router.get("/clients/:id", (req, res) => {
+  res.json({id: req.params.id, name: "João"});
+});
+```
+
+- E para finalizar esse arquivo de routas precisamos exportar essa const `router` para conseguirmos usar ela em outro módulo node:
+
+``` JS
+const express = require("express");
+const router = express.Router();
+
+router.use((req, res, next) => {
+  const init = Date.now();
+  next();
+  console.log(`Tempo = ${Date.now() - init} ms.`);
+});
+
+router.get("/produts/:id", (req, res) => {
+  res.json({id: req.params.id, name: "Caneta"});
+});
+
+router.get("/clients/:id", (req, res) => {
+  res.json({id: req.params.id, name: "João"});
+});
+
+module.exports = router;
+```
+
+- Feito isso, iremos criar um outro arquivo(chamado `ex05_app.js`) o qual iremos importar o módulo que contém o router com as rotas da aplicação mapeadas(`ex05_router.js`):
+
+``` JS
+const express = require("express");
+const server = express();
+const router = require("./ex05_router");
+```
+- Em seguida, iremos informar para o express(que está instânciado dentro da const `server`) usar essas rotas através do método `use` passando a URL `/api`, ou seja, sempre para o chamar o router(que é uma cadeia de middlewares) deve constar no início da rota o `/api`:
+
+``` JS
+const express = require("express");
+const server = express();
+const router = require("./ex05_router");
+
+server.use("/api", router);
+```
+
+- Feito isso, iremos criar uma porta, vamos informar ao servidor/`server` ficar escutando/`listen` essa porta que nesse caso será `3000`:
+
+``` JS
+const express = require("express");
+const server = express();
+const router = require("./ex05_router");
+
+server.use("/api", router);
+
+server.listen(3000, () => console.log("Executando..."));
+```
+
+- Por fim, vamos rodar esse arquivo no servidor node, para isso, no terminal(no diretório do arquivo) iremos usar o comando seguinte:
+
+``` JS
+node ex05_app.js
+     [name_file]
+```
+
+- Em seguida, para visualizarmos o retorno dessas rotas vamos chamar no navegador/ou postman as URL's `http://localhost:3000/api/produts/1` e `http://localhost:3000/api/clients/1`; no browser/postman teremos retornos assim:
+
+``` JSON
+// http://localhost:3000/api/produts/1
+
+{
+  "id": "1",
+  "name": "Caneta"
+}
+```
+
+``` JSON
+// http://localhost:3000/api/clients/1
+
+{
+  "id": "1",
+  "name": "João"
+}
+```
+
+- E no console podemos notar o retorno do tempo de execução dessas requisições em ms:
+
+``` 
+Executando...
+Tempo = 3 ms.
+Tempo = 1 ms.
+```
+
+## Express e Router são Singletons?
+
+- Quando trabalhamos com um `require` em cima de um modulo do node ele sempre vai retornar uma única instância(singleton):
+
+- Quando criamos instâncias do `express` estamos trabalhando com instâncias diferentes:
+
+- Da mesma forma quando criamos instâncias do `Router` estaremos trabalhando com instâncias diferentes:
