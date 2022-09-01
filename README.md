@@ -535,11 +535,61 @@ Executando...
 Tempo = 3 ms.
 Tempo = 1 ms.
 ```
-
 ## Express e Router são Singletons?
 
 - Quando trabalhamos com um `require` em cima de um modulo do node ele sempre vai retornar uma única instância(singleton):
 
+``` JS
+const express1 = require("express");
+const express2 = require("express");
+console.log(express1 === express2);
+
+// retorno => 
+// true
+```
+
 - Quando criamos instâncias do `express` estamos trabalhando com instâncias diferentes:
 
+``` JS
+const express1 = require("express");
+const express2 = require("express");
+console.log(express1 === express2);
+
+// retorno => 
+// true
+
+
+const server1 = express1();
+const server2 = express2();
+console.log(server1 === server2);
+
+// retorno => 
+// false
+```
+
 - Da mesma forma quando criamos instâncias do `Router` estaremos trabalhando com instâncias diferentes:
+
+``` JS
+const express1 = require("express");
+const express2 = require("express");
+console.log(express1 === express2);
+
+// retorno => 
+// true
+
+
+const server1 = express1();
+const server2 = express2();
+console.log(server1 === server2);
+
+// retorno => 
+// false
+
+
+const router1 = express1.Router();
+const router2 = express2.Router();
+console.log(router1 === router2);
+
+// retorno => 
+// false
+```
