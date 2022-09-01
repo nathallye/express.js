@@ -271,3 +271,46 @@ Fim... // executou o próximo middleware da resposta e quando terminou continuou
 ``` 
 
 - Com isso, podemos concluir que temos uma cadeia de responsabilidades, ou seja, uma cadeia de middlewares.
+
+## Método USE
+
+- Com o método use temos uma outra forma de mapear a URL e criar uma cadeia de middlewares no Express.
+Para entendermos melhor vamos duplicar o exercício anterior(`ex02.js`) e renomear essa cópia para `ex03.js` e dentro desse arquivo substituir o método `get` por `use` e no lugar da URL raiz("/") vamos colocar `/api`:
+
+``` JS
+const express = require("express");
+const server = express();
+
+server.use("/api", function(req, res, next) {
+  console.log("Início...");
+  next(); 
+  console.log("Fim...");
+});
+
+server.use("/api", function(req, res) {
+  console.log("Resposta...");
+  res.send("<h1>API!</h1>");
+});
+
+server.listen(3000, () => console.log("Executando..."));
+```
+
+- Por fim, vamos rodar esse arquivo no servidor node, para isso, no terminal(no diretório do arquivo) iremos usar o comando seguinte:
+
+``` JS
+node ex0.js
+     [name_file]
+```
+
+- Em seguida, para visualizarmos o retorno dessa rota(raiz) vamos abrir no navegador a URL `http://localhost:3000/api`; No browser termos título "API!" e no console podemos notar o retorno seguinte:
+
+``` 
+Executando...
+Início...
+Resposta...
+Fim... // executou o próximo middleware da resposta e quando terminou continuou a excutar o primeiro middleware
+```
+
+- Qual a diferença básica do `get` para o `use`? 
+O primeiro fato é que usando o método `use` estamos informando que todas as requisições(todos os métodos HTTP - GET, POST, PUT, DELETE) serão interceptadas pelo middleware informado. 
+O segundo, é que mesmo se colocarmos a URL assim `http://localhost:3000/api/blabla` ele vai continuar chamando o `/api`, isso acontece porque o `use` recebe esse parâmetro de URL como sendo o início da requisição(prefixo), então se começar com `/api` + algo ele vai continuar chamando o `/api`.
