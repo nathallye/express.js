@@ -314,3 +314,51 @@ Fim... // executou o próximo middleware da resposta e quando terminou continuou
 - Qual a diferença básica do `get` para o `use`? 
 O primeiro fato é que usando o método `use` estamos informando que todas as requisições(todos os métodos HTTP - GET, POST, PUT, DELETE) serão interceptadas pelo middleware informado. 
 O segundo, é que mesmo se colocarmos a URL assim `http://localhost:3000/api/blabla` ele vai continuar chamando o `/api`, isso acontece porque o `use` recebe esse parâmetro de URL como sendo o início da requisição(prefixo), então se começar com `/api` + algo ele vai continuar chamando o `/api`.
+
+## Método Route
+
+- Para entendermos melhor o método `route`, iremos criar um arquivo chamado `ex04.js` e nele iremos fazer a importação do `express` através do `require` e armazenando em uma variável chamada `express`.
+Em seguida, criar uma const chamada `server`(normalmente essa constante é chamada de `app`) que irá receber uma instância de `express`:
+
+``` JS
+const express = require("express");
+const server = express();
+```
+
+- Em seguida, iremos criar uma porta, vamos informar ao servidor/`server` ficar escutando/`listen` essa porta que nesse caso será `3000`.
+Caso ele consiga realmente alorcar essa porta e ficar escutando ela vamos chamar uma função callback(arrow function) que irá exibir um `console` para identificarmos que deu tudo certo:
+
+``` JS
+const express = require("express");
+const server = express();
+
+server.listen(3000, () => console.log("Executando..."));
+```
+
+- Feito isso, vamos chamar o método `route` do `server`(que armazena a instância do express) passando a URL `/clients`:
+
+``` JS
+const express = require("express");
+const server = express();
+
+server.route("/clients")
+
+server.listen(3000, () => console.log("Executando..."));
+```
+
+- A partir do método `route` podemos encadear/mapear todos os métodos para essa mesma URL informada:
+
+``` JS
+const express = require("express");
+const server = express();
+
+server.route("/clients")
+  .get((req, res) => res.send("Lista de Clientes"))
+  .post((req, res) => res.send("Novo Cliente"))
+  .put((req, res) => res.send("Altera Cliente"))
+  .delete((req, res) => res.send("Remove Cliente"))
+
+server.listen(3000, () => console.log("Executando..."));
+```
+
+- Podemos testar a resposta a essas requisições via `Postman`.
