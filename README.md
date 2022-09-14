@@ -53,7 +53,7 @@ server.use("/api", mid1);
 E para criarmos esse arquivo vamos rodar o comando seguinte no terminal:
 
 ```
-npm init -y
+npm init
 ```
 
 Ou
