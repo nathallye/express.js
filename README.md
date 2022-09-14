@@ -49,7 +49,7 @@ server.use("/api", mid1);
 
 ## Configuração 
 
-- Primeiramente, vamps criar o arquivo descritor do node `package.json` que armazena a declaração das dependências do projeto que evita a instalação novamente de todas as dependências/módulos manualmente se por ventura trocarmos de máquina ou enviarmos esse projeto para outra pessoa, podendo serem instaladas através desse arquivo usando o comando `npm install`. 
+- Primeiramente, vamos criar o arquivo descritor do node `package.json` que armazena a declaração das dependências do projeto que evita a instalação novamente de todas as dependências/módulos manualmente se por ventura trocarmos de máquina ou enviarmos esse projeto para outra pessoa, podendo serem instaladas através desse arquivo usando o comando `npm install`. 
 E para criarmos esse arquivo vamos rodar o comando seguinte no terminal:
 
 ```
